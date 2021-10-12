@@ -34,7 +34,7 @@ namespace {
                 buffer.erase(buffer.begin(), end);
                 const auto iter = buffer.emplace(buffer.end(), c);
                 const auto [_, b] = db.insert(C{c, iter});
-                assert(b);                // auto r = db.extract(C{c});
+                assert(b);
                 continue;
             }
             const auto iter = buffer.emplace(buffer.end(), c);
