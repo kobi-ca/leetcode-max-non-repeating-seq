@@ -13,7 +13,7 @@ class LeetcodeMaxNonRepeatingSeqConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
     generators = "cmake"
-    requires = ["fmt/8.0.1", "gtest/1.11.0"]
+    requires = ["fmt/8.0.1", "gtest/1.11.0", "ms-gsl/3.1.0"]
 
     def config_options(self):
         if self.settings.os == "Windows":

@@ -4,16 +4,16 @@
 #include "fmt/format.h"
 
 namespace {
-//    struct C final {
-//        C(const char c) : c_ {c} {}
-//        C(const char c, const std::size_t idx) : c_ {c} {}
-//        char c_{};
-//        std::size_t idx_{};
-//        [[nodiscard("do not discard")]]
-//        bool operator<(const char c) const noexcept { return c_ < c; }
-//    };
+    struct C final {
+        C(const char c) : c_ {c} {}
+        C(const char c, const std::list<char>::iterator iter) : c_ {c}, iter_{iter} {}
+        const char c_{};
+        const std::list<char>::iterator iter_{};
+        [[nodiscard("do not discard")]]
+        bool operator<(const C& c) const noexcept { return c_ < c.c_; }
+    };
 
-    std::set<char> db;
+    std::set<C> db;
     std::list<char> buffer;
 
     [[nodiscard("do not discard")]]
@@ -21,21 +21,41 @@ namespace {
         // using namespace std::literals; zu
         std::size_t max_so_far = 0;
         //std::size_t idx{};
+        fmt::print("sv is {}\n", sv);
         for(const auto c : sv) {
-            if (db.contains(c)) {
+            if (const auto elem = db.find(c); elem != db.end()) {
+                fmt::print("found repeating char {}\n", c);
                 //max_so_far = std::max(max_so_far, db.size());
+                // capture the maximum so far if it's bigger than what we have so far
                 max_so_far = std::max(max_so_far, buffer.size());
-                //buffer.pop_front();
-                // auto r = db.extract(C{c});
-                auto r = db.extract(c);
+                fmt::print("max so far {}\n", max_so_far);
+                // we need to:
+                //  1. delete all nodes from [begin, elem]. So to do so, we need to do something like
+                //     [begin, elem+1) since the iterator end is ")" in C++ STL
+                //  2. delete all nodes in db from [begin, elem+1)
+                const auto end =  std::next((*elem).iter_);
+                std::for_each(buffer.begin(), end, [](const char c){
+                    fmt::print("erasinc char {}\n", c);
+                    db.erase(c);
+                });
+                buffer.erase(buffer.begin(), end);
+                fmt::print("buffer size is now {}\n", buffer.size());
+                const auto iter = buffer.emplace(buffer.end(), c);
+                const auto [_, b] = db.insert(C{c, iter});
+                assert(b);                // auto r = db.extract(C{c});
+                //auto r = db.extract(c);
                 // r.value() = C{c, idx};
-                r.value() = c;
-                db.insert(std::move(r));
+                //r.value() = C{c, idx};
+                //db.(std::move(r));
                 //++idx;
                 continue;
             }
-            db.insert(c);
-            //buffer.push_back(c);
+            fmt::print("new non-repeat char found {}\n", c);
+            const auto iter = buffer.emplace(buffer.end(), c);
+            const auto [_, b] = db.insert(C{c, iter});
+            assert(b);
+            max_so_far = std::max(max_so_far, buffer.size());
+            fmt::print("non-repeat max so far {}\n", max_so_far);
             //++idx;
         }
         return max_so_far;
@@ -51,7 +71,7 @@ TEST(leetcode_max_non_repeating_seq, test0) {
 TEST(leetcode_max_non_repeating_seq, test1) {
     fmt::print("DVDA\n");
     const auto res = find_max_non_repeating_seq("DVDA");
-    ASSERT_EQ(res, 2);
+    ASSERT_EQ(res, 3);
 }
 
 TEST(leetcode_max_non_repeating_seq, test2) {
