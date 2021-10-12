@@ -39,10 +39,10 @@ namespace {
                 });
                 buffer.erase(buffer.begin(), end);
                 add(buffer, db, c);
-                continue;
+            } else {
+                add(buffer, db, c);
+                max_so_far = std::max(max_so_far, buffer.size());
             }
-            add(buffer, db, c);
-            max_so_far = std::max(max_so_far, buffer.size());
         }
         return max_so_far;
     }
