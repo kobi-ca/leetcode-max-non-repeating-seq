@@ -20,13 +20,10 @@ namespace {
 
         // using namespace std::literals; zu
         std::size_t max_so_far = 0;
-        //std::size_t idx{};
         fmt::print("sv is {}\n", sv);
         for(const auto c : sv) {
             if (const auto elem = db.find(c); elem != db.end()) {
                 fmt::print("found repeating char {}\n", c);
-                //max_so_far = std::max(max_so_far, db.size());
-                // capture the maximum so far if it's bigger than what we have so far
                 max_so_far = std::max(max_so_far, buffer.size());
                 fmt::print("max so far {}\n", max_so_far);
                 // we need to:
@@ -43,11 +40,6 @@ namespace {
                 const auto iter = buffer.emplace(buffer.end(), c);
                 const auto [_, b] = db.insert(C{c, iter});
                 assert(b);                // auto r = db.extract(C{c});
-                //auto r = db.extract(c);
-                // r.value() = C{c, idx};
-                //r.value() = C{c, idx};
-                //db.(std::move(r));
-                //++idx;
                 continue;
             }
             fmt::print("new non-repeat char found {}\n", c);
@@ -56,7 +48,6 @@ namespace {
             assert(b);
             max_so_far = std::max(max_so_far, buffer.size());
             fmt::print("non-repeat max so far {}\n", max_so_far);
-            //++idx;
         }
         return max_so_far;
     }
