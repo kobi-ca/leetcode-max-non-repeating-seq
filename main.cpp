@@ -13,11 +13,11 @@ namespace {
         bool operator<(const C& c) const noexcept { return c_ < c.c_; }
     };
 
-    std::set<C> db;
-    std::list<char> buffer;
-
     [[nodiscard("do not discard")]]
     std::size_t find_max_non_repeating_seq(const std::string_view sv) {
+        std::set<C> db;
+        std::list<char> buffer;
+
         // using namespace std::literals; zu
         std::size_t max_so_far = 0;
         //std::size_t idx{};
@@ -34,7 +34,7 @@ namespace {
                 //     [begin, elem+1) since the iterator end is ")" in C++ STL
                 //  2. delete all nodes in db from [begin, elem+1)
                 const auto end =  std::next((*elem).iter_);
-                std::for_each(buffer.begin(), end, [](const char c){
+                std::for_each(buffer.begin(), end, [&db](const char c){
                     fmt::print("erasinc char {}\n", c);
                     db.erase(c);
                 });
