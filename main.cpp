@@ -20,34 +20,27 @@ namespace {
 
         // using namespace std::literals; zu
         std::size_t max_so_far = 0;
-        fmt::print("sv is {}\n", sv);
         for(const auto c : sv) {
             if (const auto elem = db.find(c); elem != db.end()) {
-                fmt::print("found repeating char {}\n", c);
                 max_so_far = std::max(max_so_far, buffer.size());
-                fmt::print("max so far {}\n", max_so_far);
                 // we need to:
                 //  1. delete all nodes from [begin, elem]. So to do so, we need to do something like
                 //     [begin, elem+1) since the iterator end is ")" in C++ STL
                 //  2. delete all nodes in db from [begin, elem+1)
                 const auto end =  std::next((*elem).iter_);
                 std::for_each(buffer.begin(), end, [&db](const char c){
-                    fmt::print("erasinc char {}\n", c);
                     db.erase(c);
                 });
                 buffer.erase(buffer.begin(), end);
-                fmt::print("buffer size is now {}\n", buffer.size());
                 const auto iter = buffer.emplace(buffer.end(), c);
                 const auto [_, b] = db.insert(C{c, iter});
                 assert(b);                // auto r = db.extract(C{c});
                 continue;
             }
-            fmt::print("new non-repeat char found {}\n", c);
             const auto iter = buffer.emplace(buffer.end(), c);
             const auto [_, b] = db.insert(C{c, iter});
             assert(b);
             max_so_far = std::max(max_so_far, buffer.size());
-            fmt::print("non-repeat max so far {}\n", max_so_far);
         }
         return max_so_far;
     }
