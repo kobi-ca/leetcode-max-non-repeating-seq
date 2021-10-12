@@ -13,6 +13,12 @@ namespace {
         bool operator<(const C& c) const noexcept { return c_ < c.c_; }
     };
 
+    void add(std::list<char>& buffer, std::set<C>& db, const char c) {
+        const auto iter = buffer.emplace(buffer.end(), c);
+        const auto [_, b] = db.insert(C{c, iter});
+        assert(b);
+    }
+
     [[nodiscard("do not discard")]]
     std::size_t find_max_non_repeating_seq(const std::string_view sv) {
         std::set<C> db;
@@ -32,14 +38,10 @@ namespace {
                     db.erase(c);
                 });
                 buffer.erase(buffer.begin(), end);
-                const auto iter = buffer.emplace(buffer.end(), c);
-                const auto [_, b] = db.insert(C{c, iter});
-                assert(b);
+                add(buffer, db, c);
                 continue;
             }
-            const auto iter = buffer.emplace(buffer.end(), c);
-            const auto [_, b] = db.insert(C{c, iter});
-            assert(b);
+            add(buffer, db, c);
             max_so_far = std::max(max_so_far, buffer.size());
         }
         return max_so_far;
